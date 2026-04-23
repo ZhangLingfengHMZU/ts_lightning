@@ -1,0 +1,81 @@
+# =========================
+# Project data/artifacts
+# =========================
+data/
+downloads/
+lightning_logs/
+logs/
+outputs/
+
+# =========================
+# Cursor / IDE
+# =========================
+.cursor/
+.vscode/
+.idea/
+
+# =========================
+# Python cache/build
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Packaging / build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# =========================
+# Local environments
+# =========================
+.venv/
+venv/
+env/
+envs/
+.conda/
+pythonenv*
+
+# NOTE: these should usually be tracked for reproducibility:
+# environment.yml
+# conda-lock.yml
+# *.explicit.txt
+
+# =========================
+# Env vars / secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Logs / temp
+# =========================
+*.log
+tmp/
+temp/
+
+# =========================
+# Model/data binary artifacts (optional but recommended)
+# =========================
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.npy
+*.npz
+*.h5
+*.pkl
+*.joblib
+
+# =========================
+# OS noise
+# =========================
+.DS_Store
+Thumbs.db

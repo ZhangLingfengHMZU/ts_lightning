@@ -1,0 +1,4 @@
+project_root: .
+output_dir: outputs/ts_toy_classification
+log_dir: ${paths.output_dir}/logs
+checkpoint_dir: ${paths.output_dir}/checkpoints

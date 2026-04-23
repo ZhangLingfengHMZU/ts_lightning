@@ -1,0 +1,10 @@
+# ts_toy_classification: Hydra主配置入口
+defaults:
+  - dataset: sMNIST
+  - model: default
+  - train: default
+  - trainer: default
+  - paths: default
+  - _self_
+
+experiment_name: ts_toy_classification
