@@ -1,0 +1,6 @@
+defaults:
+  - dataset: dreamer
+  - train: default
+  - _self_
+
+experiment_name: mer

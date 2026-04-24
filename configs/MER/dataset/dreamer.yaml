@@ -1,0 +1,5 @@
+dataset_name: dreamer
+mat_path: data/dreamer/raw/DREAMER.mat
+win_sec: 0.5
+stride_sec: 0.5
+is_force_rebuild: false
