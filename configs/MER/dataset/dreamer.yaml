@@ -3,3 +3,7 @@ mat_path: data/dreamer/raw/DREAMER.mat
 win_sec: 0.5
 stride_sec: 0.5
 is_force_rebuild: false
+
+test_sid: 0
+val_ratio: 0.1
+seed: 42
