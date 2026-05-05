@@ -1,0 +1,17 @@
+data:
+  dataset_root: data/Mendeley_semg/raw/sEMG-dataset
+  source: filtered  # raw | filtered
+
+segment:
+  start_sec: 2.0
+  end_sec: 8.0
+
+run: # all-> 1...40; 显式列表 -> [1,2,3,...]
+  subject_ids: all
+  rep_indices: [0, 1, 2, 3, 4]
+  gesture_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  overwrite: false
+
+output:
+  segment_root: data/Mendeley_semg/processed/segments_v1
+  manifest_path: data/Mendeley_semg/processed/manifests/segments_v0.csv
