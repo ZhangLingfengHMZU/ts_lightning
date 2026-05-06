@@ -13,5 +13,5 @@ run: # all-> 1...40; 显式列表 -> [1,2,3,...]
   overwrite: false
 
 output:
-  segment_root: data/Mendeley_semg/processed/segments_v1
+  segment_root: data/Mendeley_semg/processed/segments_v0
   manifest_path: data/Mendeley_semg/processed/manifests/segments_v0.csv
