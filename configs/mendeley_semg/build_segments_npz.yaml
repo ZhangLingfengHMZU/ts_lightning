@@ -13,5 +13,9 @@ run: # all-> 1...40; 显式列表 -> [1,2,3,...]
   overwrite: false
 
 output:
-  segment_root: data/Mendeley_semg/processed/segments_v0
-  manifest_path: data/Mendeley_semg/processed/manifests/segments_v0.csv
+  # auto -> "{source}_s{start_sec}_e{end_sec}" with "." replaced by "p"
+  # e.g. filtered_s2p0_e8p0
+  version_tag: auto
+  segment_base_dir: data/Mendeley_semg/processed/segments
+  manifest_base_dir: data/Mendeley_semg/processed/manifests
+  manifest_ext: csv

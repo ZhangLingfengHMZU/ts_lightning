@@ -7,18 +7,36 @@ from typing import Any, List
 import hydra
 import numpy as np
 import pandas as pd
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig, ListConfig, OmegaConf
 
-from src.data_pipeline.mendeley_semg.mat_io import MendeleySemgMatIO
+from src.data_pipeline.mendeley_semg.io.mat_io import MendeleySemgMatIO
 
 
 def _resolve_subject_ids(subject_ids_cfg: Any) -> List[int]:
     # 支持: "all" 或 [1,2,3]
     if isinstance(subject_ids_cfg, str) and subject_ids_cfg.lower() == "all":
         return list(range(1, 41))
-    if isinstance(subject_ids_cfg, list):
+    if isinstance(subject_ids_cfg, (list, tuple, ListConfig)):
         return [int(x) for x in subject_ids_cfg]
     raise ValueError(f"Invalid run.subject_ids: {subject_ids_cfg}")
+
+
+def _format_float_tag(value: float) -> str:
+    text = f"{float(value):.6f}".rstrip("0").rstrip(".")
+    if "." not in text:
+        text = f"{text}.0"
+    return text.replace("-", "m").replace(".", "p")
+
+
+def _resolve_version_tag(cfg: DictConfig) -> str:
+    requested = str(cfg.output.version_tag)
+    if requested.lower() != "auto":
+        return requested
+
+    source = str(cfg.data.source).strip().lower()
+    start_tag = _format_float_tag(float(cfg.segment.start_sec))
+    end_tag = _format_float_tag(float(cfg.segment.end_sec))
+    return f"{source}_s{start_tag}_e{end_tag}"
 
 
 @hydra.main(
@@ -27,8 +45,22 @@ def _resolve_subject_ids(subject_ids_cfg: Any) -> List[int]:
     config_name="build_segments_npz",
 )
 def main(cfg: DictConfig) -> None:
+    version_tag = _resolve_version_tag(cfg)
+
     print("[config]")
     print(OmegaConf.to_yaml(cfg))
+    print(f"[version] {version_tag}")
+
+    manifest_ext = str(cfg.output.manifest_ext).strip().lower()
+    if manifest_ext not in {"csv", "parquet"}:
+        raise ValueError(f"output.manifest_ext must be csv or parquet, got: {manifest_ext}")
+
+    manifest_path = Path(cfg.output.manifest_base_dir) / f"segments_{version_tag}.{manifest_ext}"
+
+    if manifest_path.exists() and (not cfg.run.overwrite):
+        print(f"[skip] version already exists: {version_tag}")
+        print(f"[skip] manifest: {manifest_path}")
+        return
 
     io = MendeleySemgMatIO(
         dataset_root=cfg.data.dataset_root,
@@ -39,10 +71,8 @@ def main(cfg: DictConfig) -> None:
     rep_indices = list(cfg.run.rep_indices)
     gesture_indices = list(cfg.run.gesture_indices)
 
-    seg_root = Path(cfg.output.segment_root) / cfg.data.source
+    seg_root = Path(cfg.output.segment_base_dir) / version_tag
     seg_root.mkdir(parents=True, exist_ok=True)
-
-    manifest_path = Path(cfg.output.manifest_path)
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
 
     rows = []
@@ -104,6 +134,7 @@ def main(cfg: DictConfig) -> None:
                             "num_samples": int(x.shape[0]),
                             "num_channels": int(x.shape[1]),
                             "path": str(out_path),
+                            "version_tag": version_tag,
                             "created_at_utc": created_at_utc,
                         }
                     )
@@ -119,9 +150,7 @@ def main(cfg: DictConfig) -> None:
                         }
                     )
 
-    df = pd.DataFrame(rows).sort_values(
-        ["subject_id", "rep_idx", "gesture_idx"]
-    ).reset_index(drop=True)
+    df = pd.DataFrame(rows).sort_values(["subject_id", "rep_idx", "gesture_idx"]).reset_index(drop=True)
     df.insert(0, "row_id", df.index.astype("int64"))
 
     if manifest_path.suffix.lower() == ".csv":
